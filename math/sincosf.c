@@ -2,19 +2,7 @@
  * Single-precision sin/cos function.
  *
  * Copyright (c) 2018, Arm Limited.
- * SPDX-License-Identifier: Apache-2.0
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: MIT
  */
 
 #if WANT_SINGLEPREC
@@ -26,11 +14,10 @@
 #include "math_config.h"
 #include "sincosf.h"
 
-/* Fast sincosf implementation.  Worst-case ULP is 0.56072, maximum relative
-   error is 0.5303p-23.  A single-step signed range reduction is used for
+/* Fast sincosf implementation.  Worst-case ULP is 0.5607, maximum relative
+   error is 0.5303 * 2^-23.  A single-step range reduction is used for
    small values.  Large inputs have their range reduced using fast integer
-   arithmetic.
-*/
+   arithmetic.  */
 void
 sincosf (float y, float *sinp, float *cosp)
 {
