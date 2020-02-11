@@ -20,6 +20,9 @@ static const struct fun
 F(memmove)
 #if __aarch64__
 F(__memmove_aarch64)
+# if __ARM_NEON
+F(__memmove_aarch64_simd)
+# endif
 #endif
 #undef F
 	{0, 0}
@@ -133,10 +136,9 @@ int main()
 					test_overlap(funtab+i, d, s, n);
 				}
 			}
-		if (test_status) {
+		printf("%s %s\n", test_status ? "FAIL" : "PASS", funtab[i].name);
+		if (test_status)
 			r = -1;
-			ERR("FAIL %s\n", funtab[i].name);
-		}
 	}
 	return r;
 }

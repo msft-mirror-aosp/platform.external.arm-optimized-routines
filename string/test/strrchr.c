@@ -20,6 +20,7 @@ static const struct fun
 #define F(x) {#x, x},
 F(strrchr)
 #if __aarch64__
+F(__strrchr_aarch64)
 # if __ARM_FEATURE_SVE
 F(__strrchr_aarch64_sve)
 # endif
@@ -88,10 +89,9 @@ int main()
 				test(funtab+i, a, n / 2, n);
 			}
 		}
-		if (test_status) {
+		printf("%s %s\n", test_status ? "FAIL" : "PASS", funtab[i].name);
+		if (test_status)
 			r = -1;
-			ERR("FAIL %s\n", funtab[i].name);
-		}
 	}
 	return r;
 }

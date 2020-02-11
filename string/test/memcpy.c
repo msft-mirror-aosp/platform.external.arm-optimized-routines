@@ -19,8 +19,10 @@ static const struct fun
 #define F(x) {#x, x},
 F(memcpy)
 #if __aarch64__
-F(__memcpy_bytewise)
 F(__memcpy_aarch64)
+# if __ARM_NEON
+F(__memcpy_aarch64_simd)
+# endif
 #elif __arm__
 F(__memcpy_arm)
 #endif
@@ -88,10 +90,9 @@ int main()
 				for (; n < LEN; n *= 2)
 					test(funtab+i, d, s, n);
 			}
-		if (test_status) {
+		printf("%s %s\n", test_status ? "FAIL" : "PASS", funtab[i].name);
+		if (test_status)
 			r = -1;
-			ERR("FAIL %s\n", funtab[i].name);
-		}
 	}
 	return r;
 }
