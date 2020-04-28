@@ -5,6 +5,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+float sinf (float);
+float cosf (float);
+float tanf (float);
 float expf (float);
 float exp2f (float);
 float logf (float);

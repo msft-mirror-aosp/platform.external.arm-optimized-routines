@@ -1,6 +1,6 @@
 # Makefile - requires GNU make
 #
-# Copyright (c) 2018-2019, Arm Limited.
+# Copyright (c) 2018, Arm Limited.
 # SPDX-License-Identifier: MIT
 
 srcdir = .
@@ -9,38 +9,55 @@ bindir = $(prefix)/bin
 libdir = $(prefix)/lib
 includedir = $(prefix)/include
 
-# Build targets
-ALL_OBJS = $(math-objs) $(string-objs)
-ALL_INCLUDES = $(math-includes) $(string-includes)
-ALL_LIBS = $(math-libs) $(string-libs)
-ALL_TOOLS = $(math-tools) $(string-tools)
-HOST_TOOLS = $(math-host-tools)
+MATH_SRCS = $(wildcard $(srcdir)/math/*.[cS])
+MATH_BASE = $(basename $(MATH_SRCS))
+MATH_OBJS = $(MATH_BASE:$(srcdir)/%=build/%.o)
+RTEST_SRCS = $(wildcard $(srcdir)/test/rtest/*.[cS])
+RTEST_BASE = $(basename $(RTEST_SRCS))
+RTEST_OBJS = $(RTEST_BASE:$(srcdir)/%=build/%.o)
+ALL_OBJS = $(MATH_OBJS) \
+	$(RTEST_OBJS) \
+	build/test/mathtest.o \
+	build/test/mathbench.o \
+
+INCLUDES = $(wildcard $(srcdir)/math/include/*.h)
+ALL_INCLUDES = $(INCLUDES:$(srcdir)/math/%=build/%)
+
+ALL_LIBS = \
+	build/lib/libmathlib.so \
+	build/lib/libmathlib.a \
+
+ALL_TOOLS = \
+	build/bin/mathtest \
+	build/bin/mathbench \
+	build/bin/mathbench_libc \
+
+HOST_TOOLS = \
+	build/bin/rtest \
+
+TESTS = $(wildcard $(srcdir)/test/testcases/directed/*.tst)
+RTESTS = $(wildcard $(srcdir)/test/testcases/random/*.tst)
 
 # Configure these in config.mk, do not make changes in this file.
 HOST_CC = cc
 HOST_CFLAGS = -std=c99 -O2
 HOST_LDFLAGS =
-HOST_LDLIBS =
+HOST_LDLIBS = -lm -lmpfr -lmpc
 EMULATOR =
 CFLAGS = -std=c99 -O2
 LDFLAGS =
-LDLIBS =
+LDLIBS = -lm
 CPPFLAGS =
 AR = $(CROSS_COMPILE)ar
 RANLIB = $(CROSS_COMPILE)ranlib
 INSTALL = install
 
-CFLAGS_ALL = -Ibuild/include $(CPPFLAGS) $(CFLAGS)
+CFLAGS_ALL = -I$(srcdir)/math/include $(CPPFLAGS) $(CFLAGS)
 LDFLAGS_ALL = $(LDFLAGS)
-
-all:
 
 -include config.mk
 
-include math/Dir.mk
-include string/Dir.mk
-
-all: all-math all-string
+all: $(ALL_LIBS) $(ALL_TOOLS) $(ALL_INCLUDES)
 
 DIRS = $(dir $(ALL_LIBS) $(ALL_TOOLS) $(ALL_OBJS) $(ALL_INCLUDES))
 ALL_DIRS = $(sort $(DIRS:%/=%))
@@ -51,6 +68,11 @@ $(ALL_DIRS):
 	mkdir -p $@
 
 $(ALL_OBJS:%.o=%.os): CFLAGS_ALL += -fPIC
+
+$(RTEST_OBJS): CC = $(HOST_CC)
+$(RTEST_OBJS): CFLAGS_ALL = $(HOST_CFLAGS)
+
+build/test/mathtest.o: CFLAGS_ALL += -fmath-errno
 
 build/%.o: $(srcdir)/%.S
 	$(CC) $(CFLAGS_ALL) -c -o $@ $<
@@ -63,6 +85,29 @@ build/%.os: $(srcdir)/%.S
 
 build/%.os: $(srcdir)/%.c
 	$(CC) $(CFLAGS_ALL) -c -o $@ $<
+
+build/lib/libmathlib.so: $(MATH_OBJS:%.o=%.os)
+	$(CC) $(CFLAGS_ALL) $(LDFLAGS_ALL) -shared -o $@ $^
+
+build/lib/libmathlib.a: $(MATH_OBJS)
+	rm -f $@
+	$(AR) rc $@ $^
+	$(RANLIB) $@
+
+build/bin/rtest: $(RTEST_OBJS)
+	$(HOST_CC) $(HOST_CFLAGS) $(HOST_LDFLAGS) -o $@ $^ $(HOST_LDLIBS)
+
+build/bin/mathtest: build/test/mathtest.o build/lib/libmathlib.a
+	$(CC) $(CFLAGS_ALL) $(LDFLAGS_ALL) -static -o $@ $^ $(LDLIBS)
+
+build/bin/mathbench: build/test/mathbench.o build/lib/libmathlib.a
+	$(CC) $(CFLAGS_ALL) $(LDFLAGS_ALL) -static -o $@ $^ $(LDLIBS)
+
+build/bin/mathbench_libc: build/test/mathbench.o
+	$(CC) $(CFLAGS_ALL) $(LDFLAGS_ALL) -static -o $@ $^ $(LDLIBS)
+
+build/include/%.h: $(srcdir)/math/include/%.h
+	cp $< $@
 
 clean:
 	rm -rf build
@@ -90,6 +135,12 @@ install-headers: $(ALL_INCLUDES:build/include/%=$(DESTDIR)$(includedir)/%)
 
 install: install-libs install-headers
 
-check: check-math check-string
+check: $(ALL_TOOLS)
+	cat $(TESTS) | $(EMULATOR) build/bin/mathtest
 
-.PHONY: all clean distclean install install-tools install-libs install-headers check
+rcheck: $(HOST_TOOLS) $(ALL_TOOLS)
+	cat $(RTESTS) | build/bin/rtest | $(EMULATOR) build/bin/mathtest
+
+check-all: check rcheck
+
+.PHONY: all clean distclean install install-tools install-libs install-headers check rcheck check-all

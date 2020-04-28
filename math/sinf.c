@@ -5,6 +5,10 @@
  * SPDX-License-Identifier: MIT
  */
 
+#if WANT_SINGLEPREC
+#include "single/s_sinf.c"
+#else
+
 #include <math.h>
 #include "math_config.h"
 #include "sincosf.h"
@@ -65,3 +69,5 @@ sinf (float y)
   else
     return __math_invalidf (y);
 }
+
+#endif

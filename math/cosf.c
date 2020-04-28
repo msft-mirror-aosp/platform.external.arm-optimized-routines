@@ -5,6 +5,10 @@
  * SPDX-License-Identifier: MIT
  */
 
+#if WANT_SINGLEPREC
+#include "single/s_cosf.c"
+#else
+
 #include <stdint.h>
 #include <math.h>
 #include "math_config.h"
@@ -61,3 +65,5 @@ cosf (float y)
   else
     return __math_invalidf (y);
 }
+
+#endif
