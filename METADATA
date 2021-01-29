@@ -9,11 +9,11 @@ third_party {
     type: GIT
     value: "https://github.com/ARM-software/optimized-routines.git"
   }
-  version: "ef907c7a799ae7fd8662fb56a6c5e9437508f645"
+  version: "v20.11"
   license_type: NOTICE
   last_upgrade_date {
     year: 2020
-    month: 6
-    day: 1
+    month: 11
+    day: 30
   }
 }
