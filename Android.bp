@@ -56,14 +56,10 @@ cc_defaults {
     ],
 
     stl: "none",
-    target: {
-        bionic: {
-            static: {
-                system_shared_libs: [],
-            },
-            header_libs: ["libc_headers"],
-        },
+    static: {
+        system_shared_libs: [],
     },
+    header_libs: ["libc_headers"],
 }
 
 cc_library_static {
