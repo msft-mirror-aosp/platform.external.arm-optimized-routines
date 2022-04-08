@@ -1,18 +1,18 @@
 /*
  * strchr/strchrnul - find a character in a string
  *
- * Copyright (c) 2018-2021, Arm Limited.
+ * Copyright (c) 2018, Arm Limited.
  * SPDX-License-Identifier: MIT
  */
 
-#include "../asmdefs.h"
-
-#if __ARM_FEATURE_SVE
 /* Assumptions:
  *
  * ARMv8-a, AArch64
  * SVE Available.
  */
+
+	.arch	armv8-a+sve
+	.text
 
 /* To build as strchrnul, define BUILD_STRCHRNUL before compiling this file.  */
 #ifdef BUILD_STRCHRNUL
@@ -21,8 +21,10 @@
 #define FUNC  __strchr_aarch64_sve
 #endif
 
-ENTRY (FUNC)
-	PTR_ARG (0)
+	.globl	FUNC
+	.type	FUNC, %function
+	.p2align 4
+FUNC:
 	dup	z1.b, w1		/* replicate byte across vector */
 	setffr				/* initialize FFR */
 	ptrue	p1.b			/* all ones; loop invariant */
@@ -64,7 +66,4 @@ ENTRY (FUNC)
 	incp	x0, p0.b
 	b	0b
 
-END (FUNC)
-
-#endif
-
+	.size	FUNC, . - FUNC

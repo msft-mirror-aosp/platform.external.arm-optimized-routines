@@ -1,21 +1,23 @@
 /*
  * strrchr - find the last of a character in a string
  *
- * Copyright (c) 2019-2021, Arm Limited.
+ * Copyright (c) 2019, Arm Limited.
  * SPDX-License-Identifier: MIT
  */
 
-#include "../asmdefs.h"
-
-#if __ARM_FEATURE_SVE
 /* Assumptions:
  *
  * ARMv8-a, AArch64
  * SVE Available.
  */
 
-ENTRY (__strrchr_aarch64_sve)
-	PTR_ARG (0)
+	.arch	armv8-a+sve
+	.text
+
+	.globl	__strrchr_aarch64_sve
+	.type	__strrchr_aarch64_sve, %function
+	.p2align 4
+__strrchr_aarch64_sve:
 	dup	z1.b, w1		/* replicate byte across vector */
 	setffr				/* initialize FFR */
 	ptrue	p1.b			/* all ones; loop invariant */
@@ -78,7 +80,4 @@ ENTRY (__strrchr_aarch64_sve)
 5:	mov	x0, 0
 	ret
 
-END (__strrchr_aarch64_sve)
-
-#endif
-
+	.size	__strrchr_aarch64_sve, . - __strrchr_aarch64_sve

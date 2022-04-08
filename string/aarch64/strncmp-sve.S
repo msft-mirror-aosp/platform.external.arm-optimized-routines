@@ -1,23 +1,23 @@
 /*
  * strncmp - compare two strings with limit
  *
- * Copyright (c) 2018-2021, Arm Limited.
+ * Copyright (c) 2018, Arm Limited.
  * SPDX-License-Identifier: MIT
  */
 
-#include "../asmdefs.h"
-
-#if __ARM_FEATURE_SVE
 /* Assumptions:
  *
  * ARMv8-a, AArch64
  * SVE Available.
  */
 
-ENTRY (__strncmp_aarch64_sve)
-	PTR_ARG (0)
-	PTR_ARG (1)
-	SIZE_ARG (2)
+	.arch	armv8-a+sve
+	.text
+
+	.globl	__strncmp_aarch64_sve
+	.type	__strncmp_aarch64_sve, %function
+	.p2align 4
+__strncmp_aarch64_sve:
 	setffr				/* initialize FFR */
 	mov	x3, 0			/* initialize off */
 
@@ -63,7 +63,4 @@ ENTRY (__strncmp_aarch64_sve)
 9:	mov	x0, 0			/* return equal */
 	ret
 
-END (__strncmp_aarch64_sve)
-
-#endif
-
+	.size	__strncmp_aarch64_sve, . - __strncmp_aarch64_sve
