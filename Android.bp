@@ -46,6 +46,16 @@ cc_defaults {
         "-DWANT_MOPS=1",
     ],
     local_include_dirs: ["math/include"],
+    arch: {
+        arm64: {
+            oryon: {
+                cflags: [
+                    "-Xclang -target-feature",
+                    "-Xclang +ldp-aligned-only",
+                ],
+            },
+        },
+    },
 }
 
 cc_defaults {
@@ -101,9 +111,13 @@ cc_library_static {
         "math/sinf.c",
     ],
 
-    // arch-specific settings
     arch: {
         arm64: {
+            cflags: [
+                "-DHAVE_FAST_FMA=1",
+            ],
+        },
+        riscv64: {
             cflags: [
                 "-DHAVE_FAST_FMA=1",
             ],
