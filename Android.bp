@@ -46,6 +46,16 @@ cc_defaults {
         "-DWANT_MOPS=1",
     ],
     local_include_dirs: ["math/include"],
+    arch: {
+        arm64: {
+            oryon: {
+                cflags: [
+                    "-Xclang -target-feature",
+                    "-Xclang +ldp-aligned-only",
+                ],
+            },
+        },
+    },
 }
 
 cc_defaults {
@@ -74,15 +84,6 @@ cc_defaults {
 cc_library_static {
     name: "libarm-optimized-routines-math",
     defaults: ["libarm-optimized-routines-defaults"],
-    exclude_srcs: [
-        // Provided by:
-        // bionic/libm/upstream-freebsd/lib/msun/src/s_erf.c
-        // bionic/libm/upstream-freebsd/lib/msun/src/s_erff.c
-        "math/erf.c",
-        "math/erf_data.c",
-        "math/erff.c",
-        "math/erff_data.c",
-    ],
     srcs: [
         "math/cosf.c",
         "math/exp.c",
@@ -110,9 +111,13 @@ cc_library_static {
         "math/sinf.c",
     ],
 
-    // arch-specific settings
     arch: {
         arm64: {
+            cflags: [
+                "-DHAVE_FAST_FMA=1",
+            ],
+        },
+        riscv64: {
             cflags: [
                 "-DHAVE_FAST_FMA=1",
             ],
