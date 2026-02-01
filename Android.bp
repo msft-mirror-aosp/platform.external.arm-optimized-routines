@@ -87,6 +87,7 @@ cc_defaults {
 cc_library_static {
     name: "libarm-optimized-routines-math",
     defaults: ["libarm-optimized-routines-defaults"],
+    lfi_supported: true,
     srcs: [
         "math/cosf.c",
         "math/exp.c",
@@ -135,6 +136,11 @@ cc_library_static {
             enabled: true,
         },
     },
+
+    min_sdk_version: "apex_inherit",
+    apex_available: [
+        "com.android.media.swcodec",
+    ],
 }
 
 cc_library_static {
@@ -179,6 +185,7 @@ cc_library_static {
     nocrt: true,
     system_shared_libs: [],
     stl: "none",
+    lfi_supported: true,
     sanitize: {
         hwaddress: false,
     },
@@ -220,6 +227,10 @@ cc_library_static {
         },
     },
     visibility: ["//bionic/libc"],
+    min_sdk_version: "apex_inherit",
+    apex_available: [
+        "com.android.media.swcodec",
+    ],
 }
 
 // adb shell "/data/nativetest64/mathtest/mathtest /data/nativetest64/mathtest/test/testcases/directed/*"
