@@ -15,7 +15,7 @@ third_party {
   identifier {
     type: "Git"
     value: "https://github.com/ARM-software/optimized-routines.git"
-    version: "ecddd19b88d27e653809a7d8a425f1400b6f2705"
+    version: "3bc8091d03e002e25332fcbbd9a754538cb1109e"
     closest_version: "v25.07"
   }
 }
