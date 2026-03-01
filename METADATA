@@ -7,15 +7,15 @@ description: "Optimized implementations of various library functions for ARM arc
 third_party {
   license_type: NOTICE
   last_upgrade_date {
-    year: 2025
-    month: 10
-    day: 9
+    year: 2026
+    month: 2
+    day: 26
   }
   homepage: "https://github.com/ARM-software/optimized-routines"
   identifier {
     type: "Git"
     value: "https://github.com/ARM-software/optimized-routines.git"
-    version: "3bc8091d03e002e25332fcbbd9a754538cb1109e"
-    closest_version: "v25.07"
+    version: "649ccc8411e7c4862965710f25c570d854a1483f"
+    closest_version: "v26.01"
   }
 }
